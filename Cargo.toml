@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: © 2023 Jinwoo Park (pmnxis@gmail.com)
+#
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+[package]
+name = "billmock-mptool"
+version = "0.1.0"
+edition = "2021"
+authors = ["Jinwoo Park <pmnxis@gmail.com>"]
+license = "MIT OR Apache-2.0"
+description = "mass production tool for billmock, powered by rust-embedded"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+probe-rs = "0.21"
+sea-orm = { version = "0.12", features = [ "sqlx-postgres", "runtime-tokio-native-tls", "macros" ] }
+anyhow = "1"
+clap = { version = "4.4", features = ["derive"] }
+toml = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+bit_field = "0.10"
