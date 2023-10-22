@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: © 2023 Jinwoo Park (pmnxis@gmail.com)
+#
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+[target.'cfg(all(target_arch = "arm", target_os = "none"))']
+# [Mass Production Reminder]
+# To address supply availability and cost reduction,
+# it is possible to switch to STM32G030C6Tx.
+# However, please note that currently, in the debug build, the flash section exceeds 32KB.
+# Therefore, this change will be applicable only for production use,
+# considering its benefits in the release build.
+# runner = "probe-run --chip STM32G030C8Tx --host-log-format \"{t} [{L}] {f}:{l} {s}\""
+runner = [
+  "probe-run",
+  "--chip",
+  "STM32G030C8Tx",
+  "--log-format",
+  "{t} [{L}][ {f}:{l} ] {s}",
+]
+
+[build]
+target = "thumbv6m-none-eabi"
+
+[env]
+DEFMT_LOG = "trace"

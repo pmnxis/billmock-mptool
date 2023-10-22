@@ -1,0 +1,55 @@
+# SPDX-FileCopyrightText: © 2023 Jinwoo Park (pmnxis@gmail.com)
+#
+# SPDX-License-Identifier: CC0-1.0
+
+[package]
+name = "billmock-sn-reload-phase"
+edition = "2021"
+version = "0.2.0"
+authors = ["Jinwoo Park <pmnxis@gmail.com>"]
+license = "MIT OR Apache-2.0"
+description = "serial number reloading firmware for billmock"
+
+[features]
+default = ["billmock_default"]
+billmock_default = ["hw_mini_0v4"] # To use rust-analzyer utilizing noDefaultFeatures on vscode
+hw_0v4 = []
+hw_mini_0v4 = []
+
+[dependencies]
+embassy-sync = { version = "0.3.0", git = "https://github.com/embassy-rs/embassy.git", rev = "d94b9fe6fb6adee82c1427e72450f77a0d0973c3", features = ["defmt"] }
+embassy-executor = { version = "0.3.0", git = "https://github.com/embassy-rs/embassy.git", rev = "d94b9fe6fb6adee82c1427e72450f77a0d0973c3", features = ["nightly", "arch-cortex-m", "executor-thread", "defmt", "integrated-timers"] }
+embassy-futures = { version = "0.1.0", git = "https://github.com/embassy-rs/embassy.git", rev = "d94b9fe6fb6adee82c1427e72450f77a0d0973c3", features = ["defmt"] }
+embassy-time = { version = "0.1.5", git = "https://github.com/embassy-rs/embassy.git", rev = "d94b9fe6fb6adee82c1427e72450f77a0d0973c3", features = ["defmt", "defmt-timestamp-uptime", "tick-hz-32_768"] }
+embassy-stm32 = { version = "0.1.0", git = "https://github.com/embassy-rs/embassy.git", rev = "d94b9fe6fb6adee82c1427e72450f77a0d0973c3", features = ["nightly", "defmt", "time-driver-any", "stm32g030c8", "unstable-pac", "exti", "unstable-traits"] } # "unstable-traits" for use InputPin trait for gpio
+embassy-embedded-hal = { version = "0.1.0", git = "https://github.com/embassy-rs/embassy.git", rev = "d94b9fe6fb6adee82c1427e72450f77a0d0973c3", features = ["nightly"] }
+defmt = "0.3"
+defmt-rtt = "0.4"
+
+cortex-m = { version = "0.7.7", features = ["inline-asm", "critical-section-single-core"] } # 0.7.6
+cortex-m-rt = "0.7.3" # 0.7.0
+panic-probe = { version = "0.3", features = ["print-defmt"] }
+futures = { version = "0.3.17", default-features = false, features = ["async-await"] }
+static_cell = { version = "1.2", features = ["nightly"] }
+num_enum = { version = "0.7.0", default-features = false } # Application specific import (only `no_std` crates alllowed)
+bit_field = "0.10"
+static_assertions = "1.1.0"
+env_to_array = { version = "0.3.1", features = ["hex"] }
+zeroable = "0.2.0"
+
+[profile.release]
+# or "z"
+codegen-units = 1
+debug = 2
+debug-assertions = false # <-
+lto = 'fat'
+opt-level = "s"
+overflow-checks = false # <-
+
+[profile.dev]
+# or "z"
+codegen-units = 1
+debug = 2
+debug-assertions = true # <-
+opt-level = "s"
+overflow-checks = true # <-
