@@ -1,6 +1,6 @@
 {
     "rust-analyzer.linkedProjects": [
         "Cargo.toml",
-        "./billmock-sn-reload-phase/Cargo.toml"
+        "./otp-proof-of-concept/Cargo.toml"
     ]
 }

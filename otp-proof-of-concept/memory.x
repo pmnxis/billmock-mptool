@@ -19,7 +19,6 @@ MEMORY
    * If you wish to proceed with the change to STM32G030C6Tx,
    * please modify the FLASH LENGTH to 32KB.
   */
-  FLASH : ORIGIN = 0x08000000, LENGTH = 62K
-  DEVICE_INFO : ORIGIN = 0x0800F800, LENGTH = 2K
+  FLASH : ORIGIN = 0x08000000, LENGTH = 64K
   RAM : ORIGIN = 0x20000000, LENGTH = 8K
 }

@@ -82,7 +82,7 @@ mod flash_optkeyr {
 
 #[allow(non_upper_case_globals)]
 mod otp_area {
-    pub(crate) const address: u64 = 0x1FFF7000;
+    pub(crate) const address: u64 = 0x1FFF_7000;
 }
 
 fn get_rdp(session: &mut Session) -> Result<u8, anyhow::Error> {

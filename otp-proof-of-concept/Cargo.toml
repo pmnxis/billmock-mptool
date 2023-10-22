@@ -3,18 +3,12 @@
 # SPDX-License-Identifier: CC0-1.0
 
 [package]
-name = "billmock-sn-reload-phase"
+name = "otp-proof-of-concept"
 edition = "2021"
 version = "0.2.0"
 authors = ["Jinwoo Park <pmnxis@gmail.com>"]
 license = "MIT OR Apache-2.0"
-description = "serial number reloading firmware for billmock"
-
-[features]
-default = ["billmock_default"]
-billmock_default = ["hw_mini_0v4"] # To use rust-analzyer utilizing noDefaultFeatures on vscode
-hw_0v4 = []
-hw_mini_0v4 = []
+description = "Read serial number from otp as proof of concept with STM32G030"
 
 [dependencies]
 embassy-sync = { version = "0.3.0", git = "https://github.com/embassy-rs/embassy.git", rev = "d94b9fe6fb6adee82c1427e72450f77a0d0973c3", features = ["defmt"] }
@@ -29,13 +23,6 @@ defmt-rtt = "0.4"
 cortex-m = { version = "0.7.7", features = ["inline-asm", "critical-section-single-core"] } # 0.7.6
 cortex-m-rt = "0.7.3" # 0.7.0
 panic-probe = { version = "0.3", features = ["print-defmt"] }
-futures = { version = "0.3.17", default-features = false, features = ["async-await"] }
-static_cell = { version = "1.2", features = ["nightly"] }
-num_enum = { version = "0.7.0", default-features = false } # Application specific import (only `no_std` crates alllowed)
-bit_field = "0.10"
-static_assertions = "1.1.0"
-env_to_array = { version = "0.3.1", features = ["hex"] }
-zeroable = "0.2.0"
 
 [profile.release]
 # or "z"
