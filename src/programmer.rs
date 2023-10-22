@@ -7,8 +7,11 @@
 use bit_field::BitField;
 use probe_rs::{
     architecture::arm::ArmError,
-    flashing::{self, DownloadOptions, FlashLoader},
-    Error, MemoryInterface, Permissions, Session,
+    // flashing::{self, DownloadOptions, FlashLoader},
+    // Error,
+    MemoryInterface,
+    // Permissions,
+    Session,
 };
 use std::time::Duration;
 

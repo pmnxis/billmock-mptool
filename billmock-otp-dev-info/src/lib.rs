@@ -12,21 +12,18 @@ pub struct OtpDeviceInfo {
     pub dev_sn: [u8; 12],
     pub crc: [u8; 4],
 }
-
-#[derive(Clone, Copy, PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq, Debug, defmt::Format)]
 pub enum OtpDeviceInfoParseErorr {
     /// All bytes are filled with 0xFF
     NotCarved,
-
     /// Serial number should be ASCII digits with left margin white-space
     NonAsciiDigit,
-
     /// Bad Checksum
     BadChecksum,
 }
 
-#[cfg(not(no_std))]
-mod std_crc {
+#[cfg(any(not(feature = "no_std"), feature = "std", test))]
+pub mod std_crc {
     use crc::{Algorithm, Crc};
     const BILLMOCK_CRC: Algorithm<u32> = Algorithm {
         width: 32,
@@ -48,6 +45,12 @@ mod std_crc {
 }
 
 impl OtpDeviceInfo {
+    /// Get const OTP data from STM32G0's peripheral memory map.
+    #[cfg(all(feature = "no_std", not(feature = "std"), not(test)))]
+    pub fn from_stm32g0() -> &'static Self {
+        unsafe { core::mem::transmute(0x1FFF_7000 as usize) }
+    }
+
     pub fn is_ascii_digit(&self) -> bool {
         let mut initial_space_end = false;
         for char in self.dev_sn {
@@ -80,7 +83,7 @@ impl OtpDeviceInfo {
         true
     }
 
-    #[cfg(not(no_std))]
+    #[cfg(any(not(feature = "no_std"), feature = "std", test))]
     pub fn new(sn: u64) -> Self {
         let mut ret = OtpDeviceInfo {
             dev_sn: [b' '; 12],
@@ -103,7 +106,7 @@ impl OtpDeviceInfo {
         ret
     }
 
-    #[cfg(not(no_std))]
+    #[cfg(any(not(feature = "no_std"), feature = "std", test))]
     pub fn to_u64_arr(&self) -> [u64; 2] {
         let raw_data = unsafe {
             core::slice::from_raw_parts(
@@ -122,7 +125,7 @@ impl OtpDeviceInfo {
         [u64::from_ne_bytes(first), u64::from_ne_bytes(second)]
     }
 
-    #[cfg(not(no_std))]
+    #[cfg(any(not(feature = "no_std"), feature = "std", test))]
     pub fn from_u64_arr(value: &[u64; 2]) -> Self {
         let ret = value.clone();
 
@@ -138,7 +141,7 @@ impl OtpDeviceInfo {
             }
         }
 
-        #[cfg(not(no_std))]
+        #[cfg(any(not(feature = "no_std"), feature = "std", test))]
         if std_crc::billmock_crc(&self.dev_sn).to_le_bytes() != self.crc {
             return Err(OtpDeviceInfoParseErorr::BadChecksum);
         }
@@ -146,7 +149,7 @@ impl OtpDeviceInfo {
         Ok(())
     }
 
-    #[cfg(not(no_std))]
+    #[cfg(any(not(feature = "no_std"), feature = "std", test))]
     pub fn check_and_sn_u64(&self) -> Result<u64, OtpDeviceInfoParseErorr> {
         self.check_and_sn()?;
 

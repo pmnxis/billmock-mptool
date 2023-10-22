@@ -24,6 +24,8 @@ cortex-m = { version = "0.7.7", features = ["inline-asm", "critical-section-sing
 cortex-m-rt = "0.7.3" # 0.7.0
 panic-probe = { version = "0.3", features = ["print-defmt"] }
 
+billmock-otp-dev-info = { path = "../billmock-otp-dev-info" }
+
 [profile.release]
 # or "z"
 codegen-units = 1

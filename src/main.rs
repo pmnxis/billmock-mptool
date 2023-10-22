@@ -8,10 +8,8 @@ mod config;
 mod programmer;
 
 use billmock_otp_dev_info::*;
-use bit_field::BitField;
-use std::time::Duration;
-
-use clap::Parser;
+// use clap::Parser;
+#[allow(unused)]
 use probe_rs::{
     flashing::{self, DownloadOptions, FlashLoader},
     Error, MemoryInterface, Permissions, Session,
@@ -48,7 +46,7 @@ fn main() -> Result<(), anyhow::Error> {
                 }
                 Err(OtpDeviceInfoParseErorr::NotCarved) => {
                     // get new serial number from server
-                    let new_sn = 90123456;
+                    let new_sn = 9000_0001;
                     let otp_u64_arr = OtpDeviceInfo::new(new_sn).to_u64_arr();
                     programmer::set_otp(&mut session, otp_u64_arr)?;
 
