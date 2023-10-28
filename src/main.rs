@@ -46,7 +46,7 @@ fn main() -> Result<(), anyhow::Error> {
                 }
                 Err(OtpDeviceInfoParseErorr::NotCarved) => {
                     // get new serial number from server
-                    let new_sn = 9000_0001;
+                    let new_sn = 9040_0016;
                     let otp_u64_arr = OtpDeviceInfo::new(new_sn).to_u64_arr();
                     programmer::set_otp(&mut session, otp_u64_arr)?;
 
