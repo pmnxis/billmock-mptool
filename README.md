@@ -11,6 +11,30 @@ MPTool (Mass Production Tool) for [billmock-app-rs](https://github.com/pmnxis/bi
 ## Billmock
 Detail documentation is here [BillMock Manual](https://billmock.pmnxis.net/)
 
+## Example
+Toml
+```
+[database]
+url = "postgres://postgres:postgres@localhost:5432/postgres"
+
+[firmware]
+path = "nda/billmock-app-rs-0v4-mini-0ca2b4e.elf"
+model_name = "BillMock-HW"
+model_ver = "0.4-mini"
+firmware_ver = "0.2.1"
+firmware_git_hash = "0ca2b4e6f534c61e9786fe27bc87d95c05413e74"
+
+[serial_number]
+start = 10000001
+end = 19999999
+
+```
+
+Command Line
+```sh
+RUST_BACKTRACE=1 cargo run -- --config ./nda/20231029-BillMock-0v4-Mini.toml
+```
+
 ## License
 This program and the accompanying materials are made available under the terms
 of the Apache Software License 2.0 which is available at

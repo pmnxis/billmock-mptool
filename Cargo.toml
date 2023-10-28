@@ -13,6 +13,7 @@ description = "mass production tool for billmock, powered by rust-embedded"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+tokio = { version = "^1.33", features = ["full"] }
 probe-rs = "0.21"
 sea-orm = { version = "0.12", features = [ "sqlx-postgres", "runtime-tokio-native-tls", "macros" ] }
 anyhow = "1"
@@ -20,7 +21,9 @@ clap = { version = "4.4", features = ["derive"] }
 toml = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 bit_field = "0.10"
+lazy_static = "1.4"
 crc = "3.0"
+chrono = { version = "0.4", features = ["serde", "std"] }
 
 # Shared library with firmware side
 billmock-otp-dev-info = { path = "billmock-otp-dev-info", features = ["std"]}
