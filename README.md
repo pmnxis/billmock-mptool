@@ -5,6 +5,7 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 -->
 
 # `billmock-mptool`
+![screenshot](./docs/example.png)
 
 MPTool (Mass Production Tool) for [billmock-app-rs](https://github.com/pmnxis/billmock-app-rs)
 
