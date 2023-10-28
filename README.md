@@ -36,6 +36,13 @@ Command Line
 RUST_BACKTRACE=1 cargo run -- --config ./nda/20231029-BillMock-0v4-Mini.toml
 ```
 
+### Hardware Setup
+![hardware setup](./docs/IMG_6253.jpg)
+
+1. Configure toml and firmware and just run
+2. Connect stlink to board though pogo connector
+3. Enter
+
 ## License
 This program and the accompanying materials are made available under the terms
 of the Apache Software License 2.0 which is available at
