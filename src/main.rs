@@ -29,8 +29,13 @@ struct Args {
     #[clap(long, short = 'c', value_name = "CONFIG")]
     config: String,
 
+    /// Unlocked state
     #[clap(long, short = 'u', action = clap::ArgAction::SetTrue)]
-    unlock_only: bool,
+    unlocked: bool,
+
+    /// Grab/Give serial number process only, do not flash
+    #[clap(long, short = 'g', action = clap::ArgAction::SetTrue)]
+    sn_only: bool,
 }
 
 #[macro_use]
@@ -98,7 +103,7 @@ async fn main() -> Result<(), anyhow::Error> {
 
         // flash firmware
 
-        if rdp.is_ok() {
+        if rdp.is_ok() && !ARGS.sn_only {
             let mut session = Session::auto_attach("STM32G030C8Tx", Permissions::default())?;
             // let mut loader = session.target().flash_loader();
 
@@ -252,20 +257,22 @@ async fn main() -> Result<(), anyhow::Error> {
         }
 
         // lock firmware again
-        let mut session = Session::auto_attach("STM32G030C8Tx", Permissions::default())?;
+        if !ARGS.unlocked {
+            let mut session = Session::auto_attach("STM32G030C8Tx", Permissions::default())?;
 
-        let prev = programmer::get_rdp(&mut session)?;
+            let prev = programmer::get_rdp(&mut session)?;
 
-        if prev == 0xBB {
-            println!("Skip writing RDP");
-        } else {
-            programmer::set_rdp(&mut session, 0xBB)?;
-            println!("prev : {:2X} ---> next : {:2X}", prev, 0xBB);
+            if prev == 0xBB {
+                println!("Skip writing RDP");
+            } else {
+                programmer::set_rdp(&mut session, 0xBB)?;
+                println!("prev : {:2X} ---> next : {:2X}", prev, 0xBB);
+            }
+
+            let _ = session.core(0)?.reset();
+
+            drop(session);
         }
-
-        let _ = session.core(0)?.reset();
-
-        drop(session);
         // end of lock firmware again
 
         batch_count += 1;
