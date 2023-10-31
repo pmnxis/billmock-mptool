@@ -1,4 +1,10 @@
-{
+/*
+ * SPDX-FileCopyrightText: © 2023 Jinwoo Park (pmnxis@gmail.com)
+ *
+ * SPDX-License-Identifier: CC0-1.0
+ */
+
+ {
     "rust-analyzer.linkedProjects": [
         "Cargo.toml",
         "billmock-otp-dev-info/Cargo.toml",

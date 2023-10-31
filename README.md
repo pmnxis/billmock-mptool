@@ -16,20 +16,17 @@ Detail documentation is here [BillMock Manual](https://billmock.pmnxis.net/)
 Toml
 ```
 [database]
-url = "postgres://postgres:postgres@localhost:5432/postgres"
+url = "postgres://billmockmptool:8sMkHadVg6whC9cYdkUC93op@10.59.0.10:7171/postgres"
 
 [firmware]
-path = "nda/billmock-app-rs-0v4-mini-0ca2b4e.elf"
-model_name = "BillMock-HW"
-model_ver = "0.4-mini"
-firmware_ver = "0.2.1"
-firmware_git_hash = "0ca2b4e6f534c61e9786fe27bc87d95c05413e74"
+path = "nda/billmock-app-rs-0v5-mini-7b4c4f7.elf"
 
 [serial_number]
 start = 10000001
-end = 19999999
-
+end = 10099999
 ```
+
+model_name, model_ver, firmware_ver, firmware_git_hash fields are automatically determined by elf header `.mp_fingerprint` that defined in `mp-fingerprint-type/src/lib.rs`.
 
 Command Line
 ```sh
