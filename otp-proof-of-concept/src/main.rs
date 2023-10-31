@@ -11,7 +11,11 @@
 use billmock_otp_dev_info::OtpDeviceInfo;
 use embassy_executor::Spawner;
 use embassy_stm32::crc::{Crc, InputReverseConfig};
+use env_to_array::patch_linker_section_from_hex_env;
 use {defmt_rtt as _, panic_probe as _};
+
+// cargo objdump --release -- -s --section .mp_fingerprint
+patch_linker_section_from_hex_env!(".mp_fingerprint", "MP_INFO_TOML", "MP_FINGERPRINT_TOML_HEX");
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {

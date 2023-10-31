@@ -10,6 +10,12 @@ authors = ["Jinwoo Park <pmnxis@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "Read serial number from otp as proof of concept with STM32G030"
 
+[features]
+default = ["hw_dummy_0v3"]
+hw_dummy_0v1 = []
+hw_dummy_0v2 = []
+hw_dummy_0v3 = []
+
 [dependencies]
 embassy-sync = { version = "0.3.0", git = "https://github.com/embassy-rs/embassy.git", rev = "d94b9fe6fb6adee82c1427e72450f77a0d0973c3", features = ["defmt"] }
 embassy-executor = { version = "0.3.0", git = "https://github.com/embassy-rs/embassy.git", rev = "d94b9fe6fb6adee82c1427e72450f77a0d0973c3", features = ["nightly", "arch-cortex-m", "executor-thread", "defmt", "integrated-timers"] }
@@ -25,6 +31,13 @@ cortex-m-rt = "0.7.3" # 0.7.0
 panic-probe = { version = "0.3", features = ["print-defmt"] }
 
 billmock-otp-dev-info = { path = "../billmock-otp-dev-info" }
+env_to_array = { git = "https://github.com/pmnxis/env-to-array.git", branch = "dynamic_array_patch", features = ["hex"] }
+
+[build-dependencies]
+git2 = "0.18" # Git library for Rust
+cargo_metadata = "0.18"
+mp-fingerprint-type = { path = "../mp-fingerprint-type" } # temp dep
+hex = "0.4"
 
 [profile.release]
 # or "z"

@@ -10,6 +10,7 @@ mod config;
 mod programmer;
 
 use billmock_otp_dev_info::*;
+use mp_fingerprint_type::MpFingerprint;
 // use clap::Parser;
 #[allow(unused)]
 use probe_rs::{
@@ -66,12 +67,16 @@ async fn main() -> Result<(), anyhow::Error> {
     let mut batch_count = 0;
 
     loop {
-        let firmware_info = config.firmware.clone();
+        let firmware_path = std::path::PathBuf::from(&config.firmware.path);
+        let firmware_ext = firmware_path
+            .extension()
+            .map(|x| x.to_ascii_lowercase().to_string_lossy().to_string());
 
-        let firmware_path = std::path::PathBuf::from(&firmware_info.path);
-        let firmware_ext = firmware_path.extension().map_or(None, |x| {
-            Some(x.to_ascii_lowercase().to_string_lossy().to_string())
-        });
+        let fingerprint = MpFingerprint::from_elf(&firmware_path).firmware_fingerprint;
+
+        if batch_count == 0 {
+            println!("fingerprint : {:?}", fingerprint);
+        }
 
         println!("If you ready press any key, or if you wanna stop batch task press `Q`.");
 
@@ -147,20 +152,20 @@ async fn main() -> Result<(), anyhow::Error> {
                                         None => {
                                             let new_sn_am = entity::hardware::ActiveModel {
                                                 id: Set(sn_i64),
-                                                model_name: Set(firmware_info.model_name.clone()),
-                                                model_ver: Set(firmware_info.model_ver.clone()),
+                                                model_name: Set(fingerprint.model_name.clone()),
+                                                model_ver: Set(fingerprint.model_ver.clone()),
 
-                                                initial_firmware_ver: Set(firmware_info
+                                                initial_firmware_ver: Set(fingerprint
                                                     .firmware_ver
                                                     .clone()),
-                                                initial_firmware_git_hash: Set(firmware_info
+                                                initial_firmware_git_hash: Set(fingerprint
                                                     .firmware_git_hash
                                                     .clone()),
                                                 // latest firmware field
-                                                latest_firwmare_ver: Set(firmware_info
+                                                latest_firwmare_ver: Set(fingerprint
                                                     .firmware_ver
                                                     .clone()),
-                                                latest_firwmare_git_hash: Set(firmware_info
+                                                latest_firwmare_git_hash: Set(fingerprint
                                                     .firmware_git_hash
                                                     .clone()),
 
@@ -174,9 +179,9 @@ async fn main() -> Result<(), anyhow::Error> {
                                         Some(x) => {
                                             let mut am = x.into_active_model();
                                             am.latest_firwmare_ver =
-                                                Set(firmware_info.firmware_ver.clone());
+                                                Set(fingerprint.firmware_ver.clone());
                                             am.latest_firwmare_git_hash =
-                                                Set(firmware_info.firmware_git_hash.clone());
+                                                Set(fingerprint.firmware_git_hash.clone());
                                             am.latest_update_time = Set(current.into());
 
                                             am.update(txn).await?;
@@ -227,20 +232,14 @@ async fn main() -> Result<(), anyhow::Error> {
                         // update to server
                         let new_sn_am = entity::hardware::ActiveModel {
                             id: Set(new_sn.try_into().unwrap()),
-                            model_name: Set(firmware_info.model_name.clone()),
-                            model_ver: Set(firmware_info.model_ver.clone()),
+                            model_name: Set(fingerprint.model_name.clone()),
+                            model_ver: Set(fingerprint.model_ver.clone()),
 
-                            initial_firmware_ver: Set(firmware_info.firmware_ver.clone()),
-                            initial_firmware_git_hash: Set(config
-                                .firmware
-                                .firmware_git_hash
-                                .clone()),
+                            initial_firmware_ver: Set(fingerprint.firmware_ver.clone()),
+                            initial_firmware_git_hash: Set(fingerprint.firmware_git_hash.clone()),
                             // latest firmware field
-                            latest_firwmare_ver: Set(firmware_info.firmware_ver.clone()),
-                            latest_firwmare_git_hash: Set(config
-                                .firmware
-                                .firmware_git_hash
-                                .clone()),
+                            latest_firwmare_ver: Set(fingerprint.firmware_ver.clone()),
+                            latest_firwmare_git_hash: Set(fingerprint.firmware_git_hash.clone()),
 
                             register_time: Set(current.into()), // initial firmware field
                             latest_update_time: Set(current.into()), // latest firmware field

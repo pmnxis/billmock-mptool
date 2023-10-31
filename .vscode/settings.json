@@ -2,6 +2,7 @@
     "rust-analyzer.linkedProjects": [
         "Cargo.toml",
         "billmock-otp-dev-info/Cargo.toml",
+        "mp-fingerprint-type/Cargo.toml",
         "entity/Cargo.toml",
         // "otp-proof-of-concept/Cargo.toml",
     ],
