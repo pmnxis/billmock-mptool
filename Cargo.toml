@@ -27,6 +27,7 @@ chrono = { version = "0.4", features = ["serde", "std"] }
 
 # Shared library with firmware side
 billmock-otp-dev-info = { path = "billmock-otp-dev-info", features = ["std"]}
+mp-fingerprint-type = { path = "mp-fingerprint-type" }
 
 # Postgres server entity
 entity = { path = "entity" }

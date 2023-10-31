@@ -14,10 +14,6 @@ pub struct DatabaseConfig {
 #[derive(Clone, Deserialize, Debug)]
 pub struct FirmwareConfig {
     pub path: String,
-    pub model_name: String,        // remove later
-    pub model_ver: String,         // remove later
-    pub firmware_ver: String,      // remove later
-    pub firmware_git_hash: String, // remove later
 }
 
 #[derive(Clone, Deserialize, Debug)]
