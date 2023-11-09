@@ -49,6 +49,7 @@ fn main() -> Result<(), ()> {
             model_ver: feature_based_model_ver,
             firmware_ver: main_package.version.to_string(),
             firmware_git_hash: format!("{}", commit_hash),
+            is_nda: false,
         },
     };
 

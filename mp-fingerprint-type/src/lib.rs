@@ -19,6 +19,7 @@ pub struct FirmwareFingerprint {
     pub model_ver: String,
     pub firmware_ver: String,
     pub firmware_git_hash: String,
+    pub is_nda: bool,
 }
 
 #[derive(Clone, Deserialize, Serialize, Debug, PartialEq)]
@@ -30,6 +31,10 @@ impl MpFingerprint {
     /// convert fingerprint to upper hex string to use in build.rs
     pub fn to_hex_string(&self) -> String {
         hex::encode_upper(toml::to_string(self).expect("Serializing toml failed"))
+    }
+
+    pub fn to_string_pretty(&self) -> String {
+        toml::to_string(self).expect("Serializing toml failed")
     }
 
     pub fn from_elf<P: AsRef<Path>>(path: P) -> Self {
@@ -66,7 +71,8 @@ mod test {
                 model_name: "otp-proof-of-concept".to_owned(),
                 model_ver: "DUMMY-0V3".to_owned(),
                 firmware_ver: "0.2.0".to_owned(),
-                firmware_git_hash: "60b0d3d7075ffaab713ec0f85240829390328ec3".to_owned(),
+                firmware_git_hash: "5b417803244c8c21e77bd73d58f842066d7d29b7".to_owned(),
+                is_nda: false,
             },
         };
 

@@ -78,6 +78,21 @@ async fn main() -> Result<(), anyhow::Error> {
             println!("fingerprint : {:?}", fingerprint);
         }
 
+        if !fingerprint.is_nda {
+            println!("Firmware binary is not NDA build. If you agree to flash, type `agree`, else type other keyword");
+
+            let mut input = String::new();
+            std::io::stdin().read_line(&mut input).expect("stdin error");
+
+            if input.trim().to_lowercase() != "agree" {
+                println!(
+                    "Exit the job because disagree non-NDA flashing {}",
+                    batch_count
+                );
+                break;
+            }
+        }
+
         println!("If you ready press any key, or if you wanna stop batch task press `Q`.");
 
         let mut input = String::new();
