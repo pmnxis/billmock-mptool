@@ -14,7 +14,7 @@ description = "mass production tool for billmock, powered by rust-embedded"
 
 [dependencies]
 tokio = { version = "^1.33", features = ["full"] }
-probe-rs = "0.21"
+probe-rs = "0.23"
 sea-orm = { version = "0.12", features = [ "sqlx-postgres", "runtime-tokio-native-tls", "macros" ] }
 anyhow = "1"
 clap = { version = "4.4", features = ["derive"] }
@@ -28,6 +28,14 @@ chrono = { version = "0.4", features = ["serde", "std"] }
 # Shared library with firmware side
 billmock-otp-dev-info = { path = "billmock-otp-dev-info", features = ["std"]}
 mp-fingerprint-type = { path = "mp-fingerprint-type" }
+
+# ratatui gui
+crossterm = { version = "0.27", features = ["event-stream", "events"] }
+futures-core = { version = "0.3", optional = true, default-features = false }
+async-std = "1.12"
+futures = "0.3"
+futures-timer = "3.0"
+ratatui = "0.26.1"
 
 # Postgres server entity
 entity = { path = "entity" }

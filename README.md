@@ -40,6 +40,13 @@ RUST_BACKTRACE=1 cargo run -- --config ./nda/20231029-BillMock-0v4-Mini.toml
 2. Connect stlink to board though pogo connector
 3. Enter
 
+### OS Dependancy
+
+#### macOS
+```sh
+brew install libusb
+```
+
 ## License
 This program and the accompanying materials are made available under the terms
 of the Apache Software License 2.0 which is available at

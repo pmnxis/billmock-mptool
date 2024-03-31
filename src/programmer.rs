@@ -7,7 +7,7 @@
 use bit_field::BitField;
 use probe_rs::{
     architecture::arm::ArmError,
-    // flashing::{self, DownloadOptions, FlashLoader},
+    flashing::{DownloadOptions, FileDownloadError, Format},
     // Error,
     MemoryInterface,
     // Permissions,
@@ -175,7 +175,9 @@ pub fn set_rdp(session: &mut Session, rdp: u8) -> Result<(), anyhow::Error> {
             println!("Ok but not Ok on OBL_LAUNCH");
         }
 
-        Err(probe_rs::Error::Arm(ArmError::Probe(probe_rs::DebugProbeError::ProbeSpecific(_)))) => {
+        Err(probe_rs::Error::Arm(ArmError::Probe(
+            probe_rs::probe::DebugProbeError::ProbeSpecific(_),
+        ))) => {
             // STLINK-v3 get Arm(Probe(ProbeSpecific(CommandFailed(SwdDpError))))
             // ANYWAY, this case is correct case
         }

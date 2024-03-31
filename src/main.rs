@@ -22,7 +22,25 @@ use sea_orm::{
     Set, TransactionTrait,
 };
 
+use std::{
+    io::{stdout, Write},
+    time::Duration,
+};
+mod big_ascii;
+use futures::{future::FutureExt, select, StreamExt};
+use futures_timer::Delay;
+
+use crossterm::{
+    cursor::{position, Hide, MoveTo},
+    event::{DisableMouseCapture, EnableMouseCapture, Event, EventStream, KeyCode},
+    execute,
+    terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType},
+    Command, QueueableCommand,
+};
+
 use clap::Parser;
+
+use crate::big_ascii::BigAsciiString;
 
 #[derive(clap::Parser)]
 #[clap(about, version, author)]
@@ -46,9 +64,24 @@ lazy_static! {
     static ref ARGS: Args = Args::parse();
 }
 
+pub fn clear_screen() {
+    let mut out = stdout();
+    out.queue(Hide).unwrap();
+    out.queue(Clear(ClearType::All)).unwrap();
+    out.queue(MoveTo(0, 0)).unwrap();
+    out.flush().unwrap();
+}
+
+pub fn print_help() {
+    println!(
+        "If you ready press space or Enter.\r\nOr if you wanna stop batch task press `Q` or ESC.\r\n"
+    );
+}
+
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
     let config = config::get_config(&ARGS.config);
+    let mut reader = EventStream::new();
 
     println!("config : {:?}", config);
 
@@ -64,43 +97,88 @@ async fn main() -> Result<(), anyhow::Error> {
 
     println!("database connected");
 
+    let firmware_path = std::path::PathBuf::from(&config.firmware.path);
+    let firmware_ext = firmware_path
+        .clone()
+        .extension()
+        .map(|x| x.to_ascii_lowercase().to_string_lossy().to_string());
+
+    let fingerprint = MpFingerprint::from_elf(&firmware_path).firmware_fingerprint;
+
     let mut batch_count = 0;
+    let mut new_count = 0;
 
-    loop {
-        let firmware_path = std::path::PathBuf::from(&config.firmware.path);
-        let firmware_ext = firmware_path
-            .extension()
-            .map(|x| x.to_ascii_lowercase().to_string_lossy().to_string());
+    println!("fingerprint : {:?}\r\n", fingerprint);
 
-        let fingerprint = MpFingerprint::from_elf(&firmware_path).firmware_fingerprint;
-
-        if batch_count == 0 {
-            println!("fingerprint : {:?}", fingerprint);
-        }
-
-        if !fingerprint.is_nda {
-            println!("Firmware binary is not NDA build. If you agree to flash, type `agree`, else type other keyword");
-
-            let mut input = String::new();
-            std::io::stdin().read_line(&mut input).expect("stdin error");
-
-            if input.trim().to_lowercase() != "agree" {
-                println!(
-                    "Exit the job because disagree non-NDA flashing {}",
-                    batch_count
-                );
-                break;
-            }
-        }
-
-        println!("If you ready press any key, or if you wanna stop batch task press `Q`.");
+    if !fingerprint.is_nda {
+        println!("Firmware binary is not NDA build. If you agree to flash, type `agree`, else type other keyword");
 
         let mut input = String::new();
         std::io::stdin().read_line(&mut input).expect("stdin error");
 
-        if input.trim() == "q" {
-            println!("Exit the job, total batch task : {}", batch_count);
-            // stop batch job
+        if input.trim().to_lowercase() != "agree" {
+            println!(
+                "Exit the job because disagree non-NDA flashing {}",
+                batch_count
+            );
+            return Ok(());
+        }
+    }
+
+    loop {
+        print_help();
+
+        // println!("{}", BigAsciiString::from(format!("{}", new_count).into()));
+
+        println!(
+            "{}---------------------------------------------------------------------\n{}{}",
+            BigAsciiString::from(format!("{} /14", new_count % 14).into()),
+            BigAsciiString::from(format!("Bat {}", new_count / 14).into()),
+            BigAsciiString::from(format!("ALL {}", new_count).into())
+        );
+
+        let mut is_exit = false;
+        loop {
+            enable_raw_mode()?;
+
+            let mut delay = Delay::new(Duration::from_millis(100_000)).fuse();
+            let mut event = reader.next().fuse();
+
+            select! {
+                _ = delay => {
+                    print_help();
+                },
+                maybe_event = event => {
+                    match maybe_event {
+                        Some(Ok(event)) => {
+
+                            if event == Event::Key(KeyCode::Char(' ').into()) ||
+                             event == Event::Key(KeyCode::Enter.into()) {
+                                is_exit = false;
+                                break;
+                            }
+
+                            if event == Event::Key(KeyCode::Char('i').into()) {
+                                clear_screen();
+                                println!("Total Flashed : {:4}\r", batch_count);
+                                println!("New   Flashed : {:4}\r", new_count);
+                            }
+
+                            if event == Event::Key(KeyCode::Esc.into()) ||
+                                event == Event::Key(KeyCode::Char('q').into()) {
+                                is_exit = true;
+                                break;
+                            }
+                        }
+                        Some(Err(e)) => println!("Error: {:?}\r", e),
+                        None => break,
+                    }
+                }
+            };
+        }
+
+        disable_raw_mode()?;
+        if is_exit {
             break;
         }
 
@@ -127,6 +205,7 @@ async fn main() -> Result<(), anyhow::Error> {
             let mut session = Session::auto_attach("STM32G030C8Tx", Permissions::default())?;
             // let mut loader = session.target().flash_loader();
 
+            let firmware_path = firmware_path.clone();
             if !firmware_path.exists() {
                 panic!("firmware is not found");
             }
@@ -141,6 +220,11 @@ async fn main() -> Result<(), anyhow::Error> {
 
             println!("Firmware flashed");
         }
+
+        let model_name = fingerprint.model_name.clone();
+        let model_ver = fingerprint.model_ver.clone();
+        let firmware_ver = fingerprint.firmware_ver.clone();
+        let firmware_git_hash = fingerprint.firmware_git_hash.clone();
 
         if rdp.is_ok() {
             let mut session = Session::auto_attach("STM32G030C8Tx", Permissions::default())?;
@@ -167,22 +251,15 @@ async fn main() -> Result<(), anyhow::Error> {
                                         None => {
                                             let new_sn_am = entity::hardware::ActiveModel {
                                                 id: Set(sn_i64),
-                                                model_name: Set(fingerprint.model_name.clone()),
-                                                model_ver: Set(fingerprint.model_ver.clone()),
-
-                                                initial_firmware_ver: Set(fingerprint
-                                                    .firmware_ver
-                                                    .clone()),
-                                                initial_firmware_git_hash: Set(fingerprint
-                                                    .firmware_git_hash
-                                                    .clone()),
+                                                model_name: Set(model_name),
+                                                model_ver: Set(model_ver),
+                                                initial_firmware_ver: Set(firmware_ver.clone()),
+                                                initial_firmware_git_hash: Set(
+                                                    firmware_git_hash.clone()
+                                                ),
                                                 // latest firmware field
-                                                latest_firwmare_ver: Set(fingerprint
-                                                    .firmware_ver
-                                                    .clone()),
-                                                latest_firwmare_git_hash: Set(fingerprint
-                                                    .firmware_git_hash
-                                                    .clone()),
+                                                latest_firwmare_ver: Set(firmware_ver),
+                                                latest_firwmare_git_hash: Set(firmware_git_hash),
 
                                                 register_time: Set(current.into()), // initial firmware field
                                                 latest_update_time: Set(current.into()), // latest firmware field
@@ -193,10 +270,8 @@ async fn main() -> Result<(), anyhow::Error> {
                                         }
                                         Some(x) => {
                                             let mut am = x.into_active_model();
-                                            am.latest_firwmare_ver =
-                                                Set(fingerprint.firmware_ver.clone());
-                                            am.latest_firwmare_git_hash =
-                                                Set(fingerprint.firmware_git_hash.clone());
+                                            am.latest_firwmare_ver = Set(firmware_ver);
+                                            am.latest_firwmare_git_hash = Set(firmware_git_hash);
                                             am.latest_update_time = Set(current.into());
 
                                             am.update(txn).await?;
@@ -247,14 +322,14 @@ async fn main() -> Result<(), anyhow::Error> {
                         // update to server
                         let new_sn_am = entity::hardware::ActiveModel {
                             id: Set(new_sn.try_into().unwrap()),
-                            model_name: Set(fingerprint.model_name.clone()),
-                            model_ver: Set(fingerprint.model_ver.clone()),
+                            model_name: Set(model_name.clone()),
+                            model_ver: Set(model_ver.clone()),
 
-                            initial_firmware_ver: Set(fingerprint.firmware_ver.clone()),
-                            initial_firmware_git_hash: Set(fingerprint.firmware_git_hash.clone()),
+                            initial_firmware_ver: Set(firmware_ver.clone()),
+                            initial_firmware_git_hash: Set(firmware_git_hash.clone()),
                             // latest firmware field
-                            latest_firwmare_ver: Set(fingerprint.firmware_ver.clone()),
-                            latest_firwmare_git_hash: Set(fingerprint.firmware_git_hash.clone()),
+                            latest_firwmare_ver: Set(firmware_ver),
+                            latest_firwmare_git_hash: Set(firmware_git_hash),
 
                             register_time: Set(current.into()), // initial firmware field
                             latest_update_time: Set(current.into()), // latest firmware field
@@ -262,6 +337,7 @@ async fn main() -> Result<(), anyhow::Error> {
 
                         new_sn_am.insert(&db_conn).await?;
                         // end of update to server
+                        new_count += 1;
                     }
                     Err(e) => {
                         println!("Serial number has problem {:?}", e);
