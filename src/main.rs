@@ -31,11 +31,10 @@ use futures::{future::FutureExt, select, StreamExt};
 use futures_timer::Delay;
 
 use crossterm::{
-    cursor::{position, Hide, MoveTo},
-    event::{DisableMouseCapture, EnableMouseCapture, Event, EventStream, KeyCode},
-    execute,
+    cursor::{Hide, MoveTo},
+    event::{Event, EventStream, KeyCode},
     terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType},
-    Command, QueueableCommand,
+    QueueableCommand,
 };
 
 use clap::Parser;

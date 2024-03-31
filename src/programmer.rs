@@ -7,7 +7,6 @@
 use bit_field::BitField;
 use probe_rs::{
     architecture::arm::ArmError,
-    flashing::{DownloadOptions, FileDownloadError, Format},
     // Error,
     MemoryInterface,
     // Permissions,
