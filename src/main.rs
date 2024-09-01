@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: MIT OR Apache-2.0
  */
 
+/// The count of PCBs in single panelized PCB.
+const HW_PANEL_STD: i32 = 6;
+
 mod config;
 // mod mp_flash;
 // mod firmware;
@@ -131,8 +134,8 @@ async fn main() -> Result<(), anyhow::Error> {
 
         println!(
             "{}---------------------------------------------------------------------\n{}{}",
-            BigAsciiString::from(format!("{} /14", new_count % 14).into()),
-            BigAsciiString::from(format!("Bat {}", new_count / 14).into()),
+            BigAsciiString::from(format!("{} /{}", new_count % HW_PANEL_STD, HW_PANEL_STD).into()),
+            BigAsciiString::from(format!("Bat {}", new_count / HW_PANEL_STD).into()),
             BigAsciiString::from(format!("ALL {}", new_count).into())
         );
 
