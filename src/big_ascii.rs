@@ -1158,3 +1158,12 @@ impl std::fmt::Display for BigAsciiString {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn stuff() {
+        println!("{}", BigAsciiString::from(format!("HBD").into()));
+    }
+}

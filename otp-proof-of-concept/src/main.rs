@@ -7,6 +7,8 @@
 #![no_main]
 #![no_std]
 #![feature(type_alias_impl_trait)]
+#![feature(impl_trait_in_assoc_type)]
+#![feature(effects)] // see : https://github.com/rust-lang/rust/issues/114808
 
 use billmock_otp_dev_info::OtpDeviceInfo;
 use embassy_executor::Spawner;

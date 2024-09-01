@@ -14,4 +14,4 @@ path = "src/lib.rs"
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }
-sea-orm = { version = "0.12", features = [ "sqlx-postgres", "runtime-tokio-native-tls", "macros" ] }
+sea-orm = { version = "1.0", features = [ "sqlx-postgres", "runtime-tokio-native-tls", "macros" ] }

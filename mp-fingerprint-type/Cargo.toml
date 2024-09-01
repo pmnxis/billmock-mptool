@@ -14,4 +14,4 @@ toml = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 hex = "0.4"
 env_to_array = { version = "0.3.1", features = ["hex"] }
-elf = "0.7.3"
+elf = "0.7.4"
